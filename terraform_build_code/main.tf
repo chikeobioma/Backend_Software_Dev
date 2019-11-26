@@ -1,12 +1,12 @@
 resource "aws_security_group" "control_server_sg" {
   name        = "Control Server Security Group"
   description = "Security group for the Control Server"
-  vpc_id      = "vpc-27c7b15d"
+  vpc_id      = var.vpc_id
 
   ingress {
-    from_port   = 22
-    to_port     = 22 
-    protocol    = "tcp"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks     = ["0.0.0.0/0"]
   }
 
@@ -18,13 +18,12 @@ resource "aws_security_group" "control_server_sg" {
   }
 }
 
-
 resource "aws_instance" "control_server" {
-  ami             = "ami-02eac2c0129f6376b"
-  instance_type   = "t2.micro"
+  ami             = var.ami
+  instance_type   = var.instance_type
   vpc_security_group_ids = [aws_security_group.control_server_sg.id]
-  subnet_id       = "subnet-57052579"
-  key_name        = "private"
+  subnet_id       = var.subnet_id
+  key_name        = var.key_name
 
   tags =  {
     Name = "control_server"
@@ -32,9 +31,9 @@ resource "aws_instance" "control_server" {
   }
 
   connection {
-    user = "centos"
+    user = var.users[0]
     host = aws_instance.control_server.public_ip
-    private_key = file("/home/cobioma/Backend_Software_Dev/private.pem")
+    private_key = file(var.private_key_path)
   }
 
   provisioner "remote-exec" {
