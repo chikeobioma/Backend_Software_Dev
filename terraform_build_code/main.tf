@@ -44,72 +44,29 @@ resource "aws_instance" "control_server" {
 
 }
 
-resource "aws_dynamodb_table" "movie-collection-dynamodb-table" {
+resource "aws_dynamodb_table_item" "MovieCollection" {
+  table_name = aws_dynamodb_table.MovieCollection.name
+  hash_key   = aws_dynamodb_table.MovieCollection.hash_key
+
+  item = <<ITEM
+{
+  "MovieId": {"N": "1"},
+  "Title": {"S": "Terminator"},
+  "Format": {"S": "DVD"},
+  "Length": {"S": "01:48:02"},
+  "ReleaseYear": {"S": "1984"},
+  "Ratings": {"S": "5"}
+}
+ITEM
+}
+
+resource "aws_dynamodb_table" "MovieCollection" {
   name           = "MovieCollection"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "MovieId"
-  range_key      = "Title"
 
   attribute {
     name = "MovieId"
-    type = "S"
-  }
-
-  attribute {
-    name = "Title"
-    type = "S"
-  }
-
-  attribute {
-    name = "Format"
-    type = "S"
-  }
-
-  attribute {
-    name = "Length"
     type = "N"
-  }
-
-  attribute {
-    name = "ReleaseYear"
-    type = "N"
-  }
-
-  attribute {
-    name = "Rating"
-    type = "N"
-  }
-
-
-  ttl {
-    attribute_name = "TimeToExist"
-    enabled        = false
-  }
-
-  global_secondary_index {
-    name               = "MovieTitleIndex"
-    hash_key           = "Title"
-    range_key          = "ReleaseYear"
-    projection_type    = "ALL"
-  }
-
-  global_secondary_index {
-    name               = "MovieFormatIndex"
-    hash_key           = "Format"
-    range_key          = "Length"
-    projection_type    = "ALL"
-  }
-
-  global_secondary_index {
-    name               = "MovieRatingIndex"
-    hash_key           = "Rating"
-    range_key          = "ReleaseYear"
-    projection_type    = "ALL"
-  }
-
-
-  tags = {
-    Name        = "dynamodb-table-1"
-    Environment = "production"
   }
 }
