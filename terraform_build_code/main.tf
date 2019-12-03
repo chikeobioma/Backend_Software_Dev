@@ -70,3 +70,11 @@ resource "aws_dynamodb_table" "MovieCollection" {
     type = "N"
   }
 }
+
+resource "aws_api_gateway_rest_api" "MovieCollectionAPI" {
+  name = "MovieCollectionAPI"
+  description = "API service for storing and editing a movie collection."
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+}
