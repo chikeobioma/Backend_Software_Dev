@@ -43,3 +43,39 @@ resource "aws_instance" "control_server" {
   }
 
 }
+
+
+resource "aws_dynamodb_table_item" "MovieCollection" {
+  table_name = aws_dynamodb_table.MovieCollection.name
+  hash_key   = aws_dynamodb_table.MovieCollection.hash_key
+
+  item = <<ITEM
+{
+  "MovieId": {"N": "1"},
+  "Title": {"S": "Terminator"},
+  "Format": {"S": "DVD"},
+  "Length": {"S": "01:48:02"},
+  "ReleaseYear": {"S": "1984"},
+  "Ratings": {"S": "5"}
+}
+ITEM
+}
+
+resource "aws_dynamodb_table" "MovieCollection" {
+  name           = "MovieCollection"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "MovieId"
+
+  attribute {
+    name = "MovieId"
+    type = "N"
+  }
+}
+
+resource "aws_api_gateway_rest_api" "MovieCollectionAPI" {
+  name = "MovieCollectionAPI"
+  description = "API service for storing and editing a movie collection."
+  endpoint_configuration {
+    types = ["REGIONAL"]
+  }
+}
