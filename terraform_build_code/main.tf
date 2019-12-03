@@ -44,7 +44,6 @@ resource "aws_instance" "control_server" {
 
 }
 
-
 resource "aws_dynamodb_table_item" "MovieCollection" {
   table_name = aws_dynamodb_table.MovieCollection.name
   hash_key   = aws_dynamodb_table.MovieCollection.hash_key
