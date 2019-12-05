@@ -45,37 +45,42 @@ resource "aws_instance" "control_server" {
 }
 
 
-resource "aws_dynamodb_table_item" "MovieCollection" {
-  table_name = aws_dynamodb_table.MovieCollection.name
-  hash_key   = aws_dynamodb_table.MovieCollection.hash_key
+# resource "aws_dynamodb_table_item" "MovieCollection" {
+#   table_name = aws_dynamodb_table.MovieCollection.name
+#   hash_key   = aws_dynamodb_table.MovieCollection.hash_key
+#   range_key   = aws_dynamodb_table.MovieCollection.range_key
 
-  item = <<ITEM
-{
-  "MovieId": {"N": "1"},
-  "Title": {"S": "Terminator"},
-  "Format": {"S": "DVD"},
-  "Length": {"S": "01:48:02"},
-  "ReleaseYear": {"S": "1984"},
-  "Ratings": {"S": "5"}
-}
-ITEM
-}
+#   item = <<ITEM
+# { 
+#   "MovieId": {"S"}
+#   "Title": {"S": "Terminator"},
+#   "Format": {"S": "DVD"},
+#   "Length": {"S": "01:48:02"},
+#   "ReleaseYear": {"N": "1984"},
+#   "Ratings": {"N": "5"}
+# }
+# ITEM
+# }
 
 resource "aws_dynamodb_table" "MovieCollection" {
   name           = "MovieCollection"
   billing_mode   = "PAY_PER_REQUEST"
   hash_key       = "MovieId"
+  range_key      = "Title"
 
   attribute {
     name = "MovieId"
-    type = "N"
+    type = "S"
   }
-}
+  attribute {
+    name = "Title"
+    type = "S"
+  }
 
-resource "aws_api_gateway_rest_api" "MovieCollectionAPI" {
-  name = "MovieCollectionAPI"
-  description = "API service for storing and editing a movie collection."
-  endpoint_configuration {
-    types = ["REGIONAL"]
+  global_secondary_index {
+    name               = "title-index"
+    hash_key           = "Title"
+    projection_type    = "INCLUDE"
+    non_key_attributes = ["Title", "Format", "Length", "ReleaseYear", "Ratings"]
   }
 }
